@@ -170,7 +170,6 @@ generation_params = {
     "max_batch_size": 12,
     "no_copy_ngram": 7,
     "temperature": 10.0,
-    "early_stopping": True,
 }
 
 sentence_pairs = []
