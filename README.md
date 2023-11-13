@@ -50,7 +50,12 @@ For more detail, see our article or our [Dataset Card](https://huggingface.co/da
 You can manually download our dataset splits available in `dataset` or you can use HuggingFace dataset class as follow:
 
 ```python
+from datasets import load_dataset
 
+dataset = load_dataset("davebulaval/CSMD", "meaning")
+
+# you can use any of the following config names as a second argument:
+# "meaning", "meaning_with_data_augmentation", "meaning_holdout_identical", "meaning_holdout_unrelated"
 ```
 
 ## To Cite
