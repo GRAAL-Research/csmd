@@ -8,8 +8,10 @@
 The sub-directory `data_cleaning` contains the Python scripts used to clean and process the dataset used to produce
 the "Continuous Scale Meaning Dataset".
 
-The sub-directory `datastore` includes the original QuestEVal, SimpDa_2022 and Simplicity-DA datasets used to produce
-the "Continuous Scale Meaning Dataset".
+The sub-directory `datastore` includes the original
+QuestEVal, [SimpDa_2022](https://github.com/Yao-Dou/LENS/blob/master/data/simpDA_2022.csv)
+and [Simplicity-DA](https://github.com/feralvam/metaeval-simplification/blob/main/data/simplicity_DA.csv) datasets
+used to produce the "Continuous Scale Meaning Dataset".
 
 For more detail, see our article.
 

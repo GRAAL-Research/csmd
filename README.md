@@ -5,7 +5,8 @@
 Aggregate statistics on textual data of the four datasets used to create "Continuous Scale Meaning Dataset".
 ![img_1.png](fig/img_1.png)
 
-Aggregate statistics on meaning preservation rating data using a continuous scale (0–100) for the four datasets used to create "Continuous Scale Meaning Dataset".
+Aggregate statistics on meaning preservation rating data using a continuous scale (0–100) for the four datasets used to
+create "Continuous Scale Meaning Dataset".
 ![img.png](fig/img.png)
 
 For more detail, see our article.
