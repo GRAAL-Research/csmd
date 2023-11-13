@@ -1,3 +1,4 @@
 # Python 3.11
 datasets
 python2latex
+poutyne

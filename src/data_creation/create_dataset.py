@@ -5,7 +5,7 @@ from datasets import load_dataset, Dataset
 from poutyne import set_seeds
 from tqdm import tqdm
 
-from src.data_creation.model_generator import Generator
+from model_generator import Generator
 
 seed = 42
 root = ".."
