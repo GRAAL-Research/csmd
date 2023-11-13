@@ -135,8 +135,8 @@ os.makedirs(save_dir, exist_ok=True)
 
 # Save to disk the meaning dataset splits
 train_set.to_csv(os.path.join(save_dir, "train.tsv"), sep="\t", index=False)
-train_set.to_csv(os.path.join(save_dir, "dev.tsv"), sep="\t", index=False)
-train_set.to_csv(os.path.join(save_dir, "test.tsv"), sep="\t", index=False)
+dev_set.to_csv(os.path.join(save_dir, "dev.tsv"), sep="\t", index=False)
+test_set.to_csv(os.path.join(save_dir, "test.tsv"), sep="\t", index=False)
 
 # Data Augmentation Dataset Creation
 # For the unrelated data augmentation, we use a GPT Generator
@@ -223,8 +223,8 @@ os.makedirs(save_dir, exist_ok=True)
 
 # Save to disk the meaning dataset splits
 train_set.to_csv(os.path.join(save_dir, "train.tsv"), sep="\t", index=False)
-train_set.to_csv(os.path.join(save_dir, "dev.tsv"), sep="\t", index=False)
-train_set.to_csv(os.path.join(save_dir, "test.tsv"), sep="\t", index=False)
+dev_set.to_csv(os.path.join(save_dir, "dev.tsv"), sep="\t", index=False)
+test_set.to_csv(os.path.join(save_dir, "test.tsv"), sep="\t", index=False)
 
 # Sanity Checks holdout set
 # We also create a holdout set of original sentence pair (identical and irrelevant) never seen during training.
