@@ -264,8 +264,8 @@ os.makedirs(save_dir, exist_ok=True)
 
 # Save to disk the meaning dataset splits
 holdout_same_sentence_dataset.to_csv(
-    os.path.join(save_dir, "same_sentence.tsv"), sep="\t", index=False
+    os.path.join(save_dir, "identical.tsv"), sep="\t", index=False
 )
 holdout_irrelevant_sentence_dataset.to_csv(
-    os.path.join(save_dir, "same_sentence.tsv"), sep="\t", index=False
+    os.path.join(save_dir, "unrelated.tsv"), sep="\t", index=False
 )
