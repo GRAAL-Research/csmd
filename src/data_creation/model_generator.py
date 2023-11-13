@@ -32,7 +32,15 @@ class Generator:
         self.max_input_length = max_input_length
         self.max_output_length = max_output_length
 
-    def generate(self, bodies, max_batch_size=8, progress=False, num_runs=1, **kwargs):
+    def generate(
+        self,
+        bodies,
+        max_batch_size=8,
+        progress=False,
+        num_runs=1,
+        sort_score=False,
+        **kwargs
+    ):
         self.model.eval()
 
         N_start = len(bodies)
@@ -55,6 +63,9 @@ class Generator:
             final_outputs = []
             for i in range(N_start):
                 all_runs = outputs[num_runs * i : (num_runs * (i + 1))]
+                if sort_score:
+                    sort_key = "score" if "score" in all_runs[0] else "logprob"
+                    all_runs = sorted(all_runs, key=lambda o: -o[sort_key])
                 final_outputs.append(all_runs)
             outputs = final_outputs
         return outputs
