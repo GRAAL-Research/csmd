@@ -2,3 +2,4 @@
 datasets
 python2latex
 poutyne
+transformers

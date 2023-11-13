@@ -1,7 +1,8 @@
 import torch
 import tqdm
-import utils_sampling
 from transformers import GPT2LMHeadModel, GPT2TokenizerFast
+
+import utils_sampling
 
 """
 A generator class using a model card. Based on Keep It Simple codebase https://github.com/tingofurro/keep_it_simple.
@@ -31,9 +32,12 @@ class Generator:
         self.max_input_length = max_input_length
         self.max_output_length = max_output_length
 
-    def generate(self, bodies, max_batch_size=8, progress=False, **kwargs):
+    def generate(self, bodies, max_batch_size=8, progress=False, num_runs=1, **kwargs):
         self.model.eval()
 
+        N_start = len(bodies)
+        if num_runs > 1:
+            bodies = [body for body in bodies for i in range(num_runs)]
         N = len(bodies)
 
         outputs = []
@@ -45,6 +49,14 @@ class Generator:
             with torch.no_grad():
                 batch_outputs = self.generate_batch(batch_bodies, **kwargs)
             outputs += batch_outputs
+
+        if num_runs > 1:
+            # Refold the number of runs into N outputs
+            final_outputs = []
+            for i in range(N_start):
+                all_runs = outputs[num_runs * i : (num_runs * (i + 1))]
+                final_outputs.append(all_runs)
+            outputs = final_outputs
         return outputs
 
     def preprocess_input(self, texts):
