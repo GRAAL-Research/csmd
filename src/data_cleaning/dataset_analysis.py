@@ -18,14 +18,10 @@ os.makedirs(os.path.join(root, "datastore", "results"), exist_ok=True)
 # Stats for ASSET dataset
 asset_dataset = load_dataset("asset", "ratings", split="full")
 asset_dataset_df = asset_dataset.to_pandas()
-asset_dataset_df = asset_dataset_df[
-    asset_dataset_df["aspect"] == 0
-]  # 0 is the meaning criteria
+asset_dataset_df = asset_dataset_df[asset_dataset_df["aspect"] == 0]  # 0 is the meaning criteria
 
 # Merging the ASSET dataset into a mean per sentence
-merge_asset_dataset_df = asset_dataset_df[
-    ["original", "simplification", "original_sentence_id"]
-].drop_duplicates()
+merge_asset_dataset_df = asset_dataset_df[["original", "simplification", "original_sentence_id"]].drop_duplicates()
 asset_mean_rating = asset_dataset_df.groupby("original_sentence_id")["rating"].mean()
 merge_asset_dataset_df["rating"] = list(asset_mean_rating)
 
@@ -37,9 +33,7 @@ merge_asset_dataset_df["rating"] = list(asset_mean_rating)
     lexical_diversity_source,
 ) = dataset_analysis_batch_process(
     dataset=[text[1]["original"] for text in merge_asset_dataset_df.iterrows()],
-    output_path=os.path.join(
-        root, "datastore", "results", "asset_dataset_analysis_source.txt"
-    ),
+    output_path=os.path.join(root, "datastore", "results", "asset_dataset_analysis_source.txt"),
     num_cores=n_cores,
 )
 
@@ -51,9 +45,7 @@ merge_asset_dataset_df["rating"] = list(asset_mean_rating)
     lexical_diversity_simplification,
 ) = dataset_analysis_batch_process(
     dataset=[text[1]["simplification"] for text in merge_asset_dataset_df.iterrows()],
-    output_path=os.path.join(
-        root, "datastore", "results", "asset_dataset_analysis_simplification.txt"
-    ),
+    output_path=os.path.join(root, "datastore", "results", "asset_dataset_analysis_simplification.txt"),
     num_cores=n_cores,
 )
 
@@ -80,12 +72,8 @@ simpDA_dataset = pd.read_csv(
 )  # https://github.com/Yao-Dou/LENS/blob/master/data/simpDA_2022.csv
 
 # Merging the SimpDA dataset into a mean per sentence
-merge_simpDA_dataset_df = simpDA_dataset[
-    ["Input.original", "Input.simplified", "Input.id"]
-].drop_duplicates()
-simpDA_mean_rating = simpDA_dataset.groupby("Input.simplified")[
-    "Answer.adequacy"
-].mean()
+merge_simpDA_dataset_df = simpDA_dataset[["Input.original", "Input.simplified", "Input.id"]].drop_duplicates()
+simpDA_mean_rating = simpDA_dataset.groupby("Input.simplified")["Answer.adequacy"].mean()
 merge_simpDA_dataset_df["Answer.adequacy"] = list(simpDA_mean_rating)
 
 (
@@ -96,9 +84,7 @@ merge_simpDA_dataset_df["Answer.adequacy"] = list(simpDA_mean_rating)
     lexical_diversity_source,
 ) = dataset_analysis_batch_process(
     dataset=[text[1]["Input.original"] for text in merge_simpDA_dataset_df.iterrows()],
-    output_path=os.path.join(
-        root, "datastore", "results", "simpDA_dataset_analysis_source.txt"
-    ),
+    output_path=os.path.join(root, "datastore", "results", "simpDA_dataset_analysis_source.txt"),
     num_cores=n_cores,
 )
 
@@ -109,12 +95,8 @@ merge_simpDA_dataset_df["Answer.adequacy"] = list(simpDA_mean_rating)
     average_sentence_len_lexical_words_simplification,
     lexical_diversity_simplification,
 ) = dataset_analysis_batch_process(
-    dataset=[
-        text[1]["Input.simplified"] for text in merge_simpDA_dataset_df.iterrows()
-    ],
-    output_path=os.path.join(
-        root, "datastore", "results", "simpDA_dataset_analysis_simplification.txt"
-    ),
+    dataset=[text[1]["Input.simplified"] for text in merge_simpDA_dataset_df.iterrows()],
+    output_path=os.path.join(root, "datastore", "results", "simpDA_dataset_analysis_simplification.txt"),
     num_cores=n_cores,
 )
 
@@ -150,9 +132,7 @@ simplicity_DA_dataset = pd.read_csv(
     lexical_diversity_source,
 ) = dataset_analysis_batch_process(
     dataset=[text[1]["orig_sent"] for text in simplicity_DA_dataset.iterrows()],
-    output_path=os.path.join(
-        root, "datastore", "results", "simplicityDA_dataset_analysis_source.txt"
-    ),
+    output_path=os.path.join(root, "datastore", "results", "simplicityDA_dataset_analysis_source.txt"),
     num_cores=n_cores,
 )
 
@@ -164,9 +144,7 @@ simplicity_DA_dataset = pd.read_csv(
     lexical_diversity_simplification,
 ) = dataset_analysis_batch_process(
     dataset=[text[1]["simp_sent"] for text in simplicity_DA_dataset.iterrows()],
-    output_path=os.path.join(
-        root, "datastore", "results", "simplicityDA_dataset_analysis_simplification.txt"
-    ),
+    output_path=os.path.join(root, "datastore", "results", "simplicityDA_dataset_analysis_simplification.txt"),
     num_cores=n_cores,
 )
 
@@ -191,20 +169,12 @@ data.extend(
 
 # Stats for the cleaned QuestEval dataset (see clean_questeval_dataset for more details).
 # We use the cleaned version of QuestEval that duplicate with ASSET where remove.
-questeval_dataset = pd.read_csv(
-    os.path.join(
-        root, "datastore", "questeval_simplification_likert_ratings_cleaned.csv"
-    )
-)
+questeval_dataset = pd.read_csv(os.path.join(root, "datastore", "questeval_simplification_likert_ratings_cleaned.csv"))
 
 questeval_dataset = questeval_dataset[questeval_dataset["aspect"] == "meaning"]
 
-merge_questeval_dataset_df = questeval_dataset[
-    ["source", "simplification"]
-].drop_duplicates(keep="last")
-questeval_mean_rating = questeval_dataset.groupby(["source", "simplification"])[
-    "rating"
-].mean()
+merge_questeval_dataset_df = questeval_dataset[["source", "simplification"]].drop_duplicates(keep="last")
+questeval_mean_rating = questeval_dataset.groupby(["source", "simplification"])["rating"].mean()
 merge_questeval_dataset_df["rating"] = list(questeval_mean_rating)
 merge_questeval_dataset_df["system_name"] = questeval_dataset.loc[
     questeval_dataset[["source", "simplification"]].drop_duplicates(keep="last").index
@@ -218,9 +188,7 @@ merge_questeval_dataset_df["system_name"] = questeval_dataset.loc[
     lexical_diversity_source,
 ) = dataset_analysis_batch_process(
     dataset=[text[1]["source"] for text in merge_questeval_dataset_df.iterrows()],
-    output_path=os.path.join(
-        root, "datastore", "results", "questeval_dataset_analysis_source.txt"
-    ),
+    output_path=os.path.join(root, "datastore", "results", "questeval_dataset_analysis_source.txt"),
     num_cores=n_cores,
 )
 
@@ -231,9 +199,7 @@ merge_questeval_dataset_df["system_name"] = questeval_dataset.loc[
     average_sentence_len_lexical_words_simplification,
     lexical_diversity_simplification,
 ) = dataset_analysis_batch_process(
-    dataset=[
-        text[1]["simplification"] for text in merge_questeval_dataset_df.iterrows()
-    ],
+    dataset=[text[1]["simplification"] for text in merge_questeval_dataset_df.iterrows()],
     output_path=os.path.join(
         "../../..",
         "datastore",

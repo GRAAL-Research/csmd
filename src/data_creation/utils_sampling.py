@@ -1,9 +1,7 @@
 import torch
 
 
-def top_k_top_p_filtering(
-    logits, top_k=0, top_p=1.0, filter_value=-float("Inf"), min_tokens_to_keep=1
-):
+def top_k_top_p_filtering(logits, top_k=0, top_p=1.0, filter_value=-float("Inf"), min_tokens_to_keep=1):
     """Filter a distribution of logits using top-k and/or nucleus (top-p) filtering
     Args:
         logits: logits distribution shape (batch size, vocabulary size)
@@ -35,9 +33,7 @@ def top_k_top_p_filtering(
         sorted_indices_to_remove[..., 0] = 0
 
         # scatter sorted tensors to original indexing
-        indices_to_remove = sorted_indices_to_remove.scatter(
-            1, sorted_indices, sorted_indices_to_remove
-        )
+        indices_to_remove = sorted_indices_to_remove.scatter(1, sorted_indices, sorted_indices_to_remove)
 
         logits[indices_to_remove] = filter_value
 
@@ -56,10 +52,7 @@ def ngram_copy_filtering(generateds, no_copy_texts, logits, n_gram=3):
 
     N1, L1 = generateds.shape
     N2, L2 = no_copy_texts.shape
-    assert N1 == N2, (
-        "The number of elements in generateds and no_copy_texts do not match (%d != %d)"
-        % (N1, N2)
-    )
+    assert N1 == N2, "The number of elements in generateds and no_copy_texts do not match (%d != %d)" % (N1, N2)
 
     if L1 < n_gram or L2 < n_gram:
         return logits
@@ -69,9 +62,7 @@ def ngram_copy_filtering(generateds, no_copy_texts, logits, n_gram=3):
 
     for i, (generated, no_cp_txt) in enumerate(zip(generateds, no_copy_texts)):
         last_k = generated[-n_gram:]
-        start_idxs = [
-            x for x in range(L2 - n_gram) if no_cp_txt[x : (x + n_gram)] == last_k
-        ]
+        start_idxs = [x for x in range(L2 - n_gram) if no_cp_txt[x : (x + n_gram)] == last_k]
         to_remove = [no_cp_txt[start_idx + n_gram] for start_idx in start_idxs]
         if len(to_remove) > 0:
             logits[i, to_remove] -= 1000.0

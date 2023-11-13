@@ -119,9 +119,7 @@ def compute_stats(data_row):
     )
 
 
-def dataset_analysis_batch_process(
-    dataset: List, output_path: str, num_cores: int = 10
-) -> Tuple:
+def dataset_analysis_batch_process(dataset: List, output_path: str, num_cores: int = 10) -> Tuple:
     """
     Batch processing the datasets.
     """
@@ -159,27 +157,17 @@ def dataset_analysis_batch_process(
     vocabulary_size = len(vocabulary)
     vocabulary_size_lexical_words = len(vocabulary_lexical_words)
     average_sentences_len = mean(average_sentences_len_per_document)
-    average_sentence_len_lexical_words = mean(
-        average_sentence_len_lexical_words_per_document
-    )
-    lexical_diversity = vocabulary_size_lexical_words / sum(
-        number_of_lexical_words_per_document
-    )
+    average_sentence_len_lexical_words = mean(average_sentence_len_lexical_words_per_document)
+    lexical_diversity = vocabulary_size_lexical_words / sum(number_of_lexical_words_per_document)
 
     with open(output_path, "w") as file:
         print(f"The number of vocabulary size is : {vocabulary_size}")
-        print(
-            f"The number of vocabulary size of lexical words is : {vocabulary_size_lexical_words}"
-        )
+        print(f"The number of vocabulary size of lexical words is : {vocabulary_size_lexical_words}")
 
         print(f"The average sentence len is: {average_sentences_len}")
-        print(
-            f"The average sentence len lexical words is: {average_sentence_len_lexical_words}"
-        )
+        print(f"The average sentence len lexical words is: {average_sentence_len_lexical_words}")
         print(f"The lexical richness is: {lexical_diversity}")
-        print(
-            f"The top 50 words frequencies are: {overall_lexical_words_counter.most_common(50)}"
-        )
+        print(f"The top 50 words frequencies are: {overall_lexical_words_counter.most_common(50)}")
 
         print(f"The number of vocabulary size is : {vocabulary_size}", file=file)
         print(

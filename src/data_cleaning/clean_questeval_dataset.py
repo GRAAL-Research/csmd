@@ -13,9 +13,7 @@ asset_dataset = load_dataset("asset", "ratings", split="full")
 asset_dataset_df = asset_dataset.to_pandas()
 
 # We load the QuestEval dataset included in this repository.
-questeval_dataset = pd.read_csv(
-    os.path.join("datastore", "questeval_simplification_likert_ratings.csv")
-)
+questeval_dataset = pd.read_csv(os.path.join("datastore", "questeval_simplification_likert_ratings.csv"))
 questeval_dataset = questeval_dataset.drop(columns=["references", "worker_id"])
 
 # We identify the similar indexes between the two datasets based on source, simplification, rating, sentence_id,
