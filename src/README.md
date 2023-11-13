@@ -1,4 +1,4 @@
-# Source Code use to produce "[MeaningBERT: Assessing Meaning Preservation Between Sentences](https://www.frontiersin.org/articles/10.3389/frai.2023.1223924/full) CSM dataset"
+# Source Code, in Python 3.11, use to produce "[MeaningBERT: Assessing Meaning Preservation Between Sentences](https://www.frontiersin.org/articles/10.3389/frai.2023.1223924/full) CSM dataset"
 
 > For the source code to produce the models, see
 > our [MeaningBERT repository](https://github.com/GRAAL-Research/MeaningBERT).
