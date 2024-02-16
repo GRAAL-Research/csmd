@@ -43,11 +43,11 @@ The split statistics of CSMD are given below.
 
 All the splits are randomly split using a 60-10-30 split with the seed `42`.
 
-For more detail, see our article or our [Dataset Card](https://huggingface.co/datasets/davebulaval/csmd) on HuggingFace.
+For more details, see our article or our [Dataset Card](https://huggingface.co/datasets/davebulaval/csmd) on HuggingFace.
 
 ## Download the dataset
 
-You can manually download our dataset splits available in `dataset` or you can use HuggingFace dataset class as follow:
+You can manually download our dataset splits available in `dataset`, or you can use the HuggingFace dataset class as follows:
 
 ```python
 from datasets import load_dataset
