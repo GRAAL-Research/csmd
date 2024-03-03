@@ -2,8 +2,12 @@ import os
 
 import pandas as pd
 from datasets import load_dataset, Dataset
+from evaluate import load
 from poutyne import set_seeds
 from tqdm import tqdm
+
+rouge = load("rouge")
+bleu = load("sacrebleu")
 
 seed = 42
 root = ".."
@@ -138,17 +142,35 @@ identical_df = pd.DataFrame.from_dict(sentence_pairs, orient="columns")
 asset_simplification_validation_dataset = load_dataset("asset", "simplification", split="validation").to_pandas()
 
 sentence_pairs = []
-for idx, (_, sentence) in tqdm(enumerate(merged_all_data_dataset.iterrows()), total=len(merged_all_data_dataset)):
-    orig_sent = sentence["original"]
-    selected_prediction = asset_simplification_validation_dataset["original"][idx]
+running_idx = 0
+resampled = 0
+for _, sentence in tqdm(merged_all_data_dataset.iterrows(), total=len(merged_all_data_dataset)):
+    valid = False
+    while not valid:
+        orig_sent = sentence["original"]
+        selected_prediction = asset_simplification_validation_dataset["original"][running_idx]
 
-    sentence_pairs.append(
-        {
-            "original": orig_sent,
-            "simplification": selected_prediction,
-            "label": 0.0,
-        }
-    )
+        rouge_score = rouge.compute(predictions=[selected_prediction], references=[orig_sent])
+        bleu_score = bleu.compute(predictions=[orig_sent], references=[selected_prediction])["score"]
+
+        if (
+            rouge_score["rouge1"] < 0.20
+            and rouge_score["rouge2"] < 0.20
+            and rouge_score["rougeL"] < 0.20
+            and bleu_score < 20
+        ):
+            sentence_pairs.append(
+                {
+                    "original": orig_sent,
+                    "simplification": selected_prediction,
+                    "label": 0.0,
+                }
+            )
+            valid = True
+            running_idx += 1
+        else:
+            running_idx += 1
+            resampled += 1
 
 unrelated_dataset_df = pd.DataFrame.from_dict(sentence_pairs, orient="columns")
 
@@ -176,9 +198,9 @@ save_dir = os.path.join(root, "datastore", "meaning_with_data_augmentation")
 os.makedirs(save_dir, exist_ok=True)
 
 # Save to disk the meaning dataset splits
-train_set.to_csv(os.path.join(save_dir, "train.tsv"), sep="\t", index=False)
-dev_set.to_csv(os.path.join(save_dir, "dev.tsv"), sep="\t", index=False)
-test_set.to_csv(os.path.join(save_dir, "test.tsv"), sep="\t", index=False)
+train_set.to_csv(os.path.join(save_dir, "train_da.tsv"), sep="\t", index=False)
+dev_set.to_csv(os.path.join(save_dir, "dev_da.tsv"), sep="\t", index=False)
+test_set.to_csv(os.path.join(save_dir, "test_da.tsv"), sep="\t", index=False)
 
 # Sanity Checks holdout set
 # We also create a holdout set of original sentence pair (identical and irrelevant) never seen during training.
@@ -198,19 +220,35 @@ holdout_same_sentence_dataset = pd.DataFrame(
 
 sentence_pairs = []
 asset_val_set_len = len(asset_simplification_validation_dataset["original"])
-for idx, (_, sentence) in tqdm(
-    enumerate(asset_simplification_test_dataset.iterrows()), total=len(merged_all_data_dataset)
-):
-    orig_sent = sentence["original"]
-    selected_prediction = asset_simplification_validation_dataset["original"][asset_val_set_len - idx - 1]
+running_idx = 0
+resampled = 0
+for _, sentence in tqdm(asset_simplification_test_dataset.iterrows(), total=len(asset_simplification_test_dataset)):
+    valid = False
+    while not valid:
+        orig_sent = sentence["original"]
+        selected_prediction = asset_simplification_validation_dataset["original"][asset_val_set_len - running_idx - 1]
 
-    sentence_pairs.append(
-        {
-            "original": orig_sent,
-            "simplification": selected_prediction,
-            "label": 0.0,
-        }
-    )
+        rouge_score = rouge.compute(predictions=[selected_prediction], references=[orig_sent])
+        bleu_score = bleu.compute(predictions=[orig_sent], references=[selected_prediction])["score"]
+
+        if (
+            rouge_score["rouge1"] < 0.25
+            and rouge_score["rouge2"] < 0.25
+            and rouge_score["rougeL"] < 0.25
+            and bleu_score < 25
+        ):
+            sentence_pairs.append(
+                {
+                    "original": orig_sent,
+                    "simplification": selected_prediction,
+                    "label": 0.0,
+                }
+            )
+            valid = True
+            running_idx += 1
+        else:
+            running_idx += 1
+            resampled += 1
 
 holdout_irrelevant_sentence_dataset = pd.DataFrame.from_dict(sentence_pairs, orient="columns")
 

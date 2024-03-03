@@ -3,3 +3,5 @@ datasets
 python2latex
 poutyne
 transformers
+rouge_score
+sacrebleu
