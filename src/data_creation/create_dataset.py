@@ -5,8 +5,6 @@ from datasets import load_dataset, Dataset
 from poutyne import set_seeds
 from tqdm import tqdm
 
-from model_generator import Generator
-
 seed = 42
 root = ".."
 
@@ -137,31 +135,13 @@ for _, sentence in merged_all_data_dataset.iterrows():
 
 identical_df = pd.DataFrame.from_dict(sentence_pairs, orient="columns")
 
-# Second, we create the unrelated pairs using a GPT generator.
-simplifier = Generator(
-    "gpt2-medium",
-    max_input_length=90,
-    device="cuda",
-)
-
-generation_params = {
-    "max_output_length": 90,
-    "sample": True,
-    "num_runs": 8,
-    "no_repeat_ngram": 5,
-    "max_batch_size": 12,
-    "no_copy_ngram": 7,
-    "temperature": 10.0,
-}
+asset_simplification_validation_dataset = load_dataset("asset", "simplification", split="validation").to_pandas()
 
 sentence_pairs = []
-for _, sentence in tqdm(merged_all_data_dataset.iterrows(), total=len(merged_all_data_dataset)):
+for idx, (_, sentence) in tqdm(enumerate(merged_all_data_dataset.iterrows()), total=len(merged_all_data_dataset)):
     orig_sent = sentence["original"]
+    selected_prediction = asset_simplification_validation_dataset["original"][idx]
 
-    # Approach using KiS simplifier but in this context, it is more like a normal generator
-    predictions = simplifier.generate([orig_sent], **generation_params, sort_score=True)[0]
-    # We take the worst prediction to be used as the paired sentence
-    selected_prediction = predictions[-1]["output_text"]
     sentence_pairs.append(
         {
             "original": orig_sent,
@@ -205,31 +185,34 @@ test_set.to_csv(os.path.join(save_dir, "test.tsv"), sep="\t", index=False)
 # for that we use the ASSET simplification dataset that does not include annotation.
 # For the identical sentence pair, the label is 100.
 # For the unrelated sentence pair, the label is 0.
-asset_simplification_dataset = load_dataset("asset", "simplification", split="test")
+asset_simplification_test_dataset = load_dataset("asset", "simplification", split="test").to_pandas()
 
-length = len(asset_simplification_dataset.to_pandas()["original"])
+length = len(asset_simplification_test_dataset["original"])
 holdout_same_sentence_dataset = pd.DataFrame(
     {
-        "original": asset_simplification_dataset.to_pandas()["original"],
-        "simplification": asset_simplification_dataset.to_pandas()["original"],
+        "original": asset_simplification_test_dataset["original"],
+        "simplification": asset_simplification_test_dataset["original"],
         "label": [100.00] * length,
     }
 )
 
-irrelevant_sentence_dataset_predictions = []
-for original_sentence in tqdm(asset_simplification_dataset.to_pandas()["original"]):
-    predictions = simplifier.generate([original_sentence], **generation_params, sort_score=True)[0]
-    # We take the worst prediction to be used as the paired sentence
-    selected_prediction = predictions[-1]["output_text"]
-    irrelevant_sentence_dataset_predictions.append(selected_prediction)
+sentence_pairs = []
+asset_val_set_len = len(asset_simplification_validation_dataset["original"])
+for idx, (_, sentence) in tqdm(
+    enumerate(asset_simplification_test_dataset.iterrows()), total=len(merged_all_data_dataset)
+):
+    orig_sent = sentence["original"]
+    selected_prediction = asset_simplification_validation_dataset["original"][asset_val_set_len - idx - 1]
 
-holdout_irrelevant_sentence_dataset = pd.DataFrame(
-    {
-        "original": asset_simplification_dataset.to_pandas()["original"],
-        "simplification": irrelevant_sentence_dataset_predictions,
-        "label": [0.00] * length,
-    }
-)
+    sentence_pairs.append(
+        {
+            "original": orig_sent,
+            "simplification": selected_prediction,
+            "label": 0.0,
+        }
+    )
+
+holdout_irrelevant_sentence_dataset = pd.DataFrame.from_dict(sentence_pairs, orient="columns")
 
 save_dir = os.path.join(root, "datastore", "holdout")
 os.makedirs(save_dir, exist_ok=True)
