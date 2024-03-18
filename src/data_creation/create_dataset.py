@@ -173,16 +173,16 @@ for _, sentence in tqdm(merged_all_data_dataset.iterrows(), total=len(merged_all
 
 unrelated_dataset_df = pd.DataFrame.from_dict(sentence_pairs, orient="columns")
 
-merged_all_data_dataset = pd.concat(
+# We do not include the identical since it will duplicate rows.
+half_merged_all_data_dataset = pd.concat(
     [
         merged_all_data_dataset,
-        identical_df,
         unrelated_dataset_df,
     ]
 )
 
 inverse_pair = []
-for data in merged_all_data_dataset.iterrows():
+for data in half_merged_all_data_dataset.iterrows():
     row = data[1]
     original = row["original"]
     simplification = row["simplification"]
@@ -191,7 +191,7 @@ for data in merged_all_data_dataset.iterrows():
     inverse_pair.append(inverse_sentence_document)
 
 inverse_pair_df = pd.DataFrame.from_dict(inverse_pair, orient="columns")
-merged_all_data_dataset = pd.concat([merged_all_data_dataset, inverse_pair_df])
+merged_all_data_dataset = pd.concat([half_merged_all_data_dataset, identical_df, inverse_pair_df])
 
 complete_dataset = Dataset.from_pandas(merged_all_data_dataset, preserve_index=False)
 
