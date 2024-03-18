@@ -123,7 +123,6 @@ dev_set.to_csv(os.path.join(save_dir, "dev.tsv"), sep="\t", index=False)
 test_set.to_csv(os.path.join(save_dir, "test.tsv"), sep="\t", index=False)
 
 # Data Augmentation Dataset Creation
-# For the unrelated data augmentation, we use a GPT Generator
 
 # We first create the identical pairs.
 
@@ -181,6 +180,18 @@ merged_all_data_dataset = pd.concat(
         unrelated_dataset_df,
     ]
 )
+
+inverse_pair = []
+for data in merged_all_data_dataset.iterrows():
+    row = data[1]
+    original = row["original"]
+    simplification = row["simplification"]
+    label = row["label"]
+    inverse_sentence_document = {"original": simplification, "simplification": original, "label": label}
+    inverse_pair.append(inverse_sentence_document)
+
+inverse_pair_df = pd.DataFrame.from_dict(inverse_pair, orient="columns")
+merged_all_data_dataset = pd.concat([merged_all_data_dataset, inverse_pair_df])
 
 complete_dataset = Dataset.from_pandas(merged_all_data_dataset, preserve_index=False)
 
